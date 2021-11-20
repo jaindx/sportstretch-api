@@ -1,15 +1,17 @@
-var express = require("express");
-var app = express();
+const express = require("express");
+const app = express();
+const therapists = require("./routes/therapists");
+const config = require("config");
 
-app.get("/" , (req,res)=>{
-    res.send("here")
+app.use(express.json());
+app.use("/therapists", therapists);
+
+app.get("/" , (req, res)=>{
+    res.send("Welcome to SportStretch!");
 })
 
-app.get("/url", (req, res, next) => {
-    res.json(["Hello World"]);
-   });
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || config.get("port");
 
-app.listen(PORT, () => {
- console.log("Server running on port " + PORT);
+app.listen(port, () => {
+ console.log("Server running on port " + port);
 });
