@@ -13,21 +13,27 @@ const pool = new Pool({
 }
 );
 
-router.get("/", async (req, res) => {
+router.get("/all", async (req, res) => {
     try {
-        const allTherapists = await pool.query("SELECT * FROM tb_Therapist");
-        res.json(allTherapists.rows);
+        const allTherapists = await pool.query("SELECT * FROM tb_therapist");
+        res.status(200).json(allTherapists.rows);
     } catch (err) {
         console.log(err.message);
     }
 });
 
-router.get("/:state", async (req, res) => {
+router.get("/enabled/online", async (req, res) => {
     try {
-        const { state } = req.params;
-        const stateName = us_states[state];
-        const nearbyTherapists = await pool.query("SELECT * FROM tb_Therapist WHERE state = $1", [stateName]);
-        res.json(nearbyTherapists.rows);
+        const state = req.query.state;
+        if (state) {
+            const stateName = us_states[state];
+            const therapists = await pool.query("SELECT * FROM tb_therapist WHERE enabled = 1 and status = true and state = $1", [stateName]);
+            res.status(200).json(therapists.rows);
+        }
+        else {
+            const therapists = await pool.query("SELECT * FROM tb_therapist WHERE enabled = 1 and status = true");
+            res.status(200).json(therapists.rows);
+        }
     } catch (err) {
         console.log(err.message);
     }
