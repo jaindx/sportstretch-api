@@ -36,7 +36,13 @@ router.post("/", async (req, res) => {
         //populate userObj accordingly
     }
     else if (user.rows[0].role === "admin") {
-        //populate userObj accordingly
+        const athlete = await pool.query("SELECT athlete_id, first_name, last_name, mobile FROM tb_athlete WHERE fk_authorization_id = $1", [user.rows[0].authorization_id]);
+        userObj = {
+            admin_id : athlete.rows[0].athlete_id,
+            first_name : athlete.rows[0].first_name,
+            last_name : athlete.rows[0].last_name,
+            mobile: athlete.rows[0].mobile
+        }
     }
 
     const authResObj = {
