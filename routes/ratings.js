@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const config = require('config');
+const auth = require('../middleware/auth');
 
 const Pool = require('pg').Pool;
 const pool = new Pool({
@@ -11,7 +12,7 @@ const pool = new Pool({
 }
 );
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
     try {
         const fk_bookings_id = parseInt(req.params.id, 10);
         const { starrating } = req.body;
@@ -22,7 +23,7 @@ router.put("/:id", async (req, res) => {
     }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
     const { fk_bookings_id, fk_therapist_id, starrating } = req.body;
     const newRating = await pool.query("INSERT INTO tb_ratings (fk_bookings_id, fk_therapist_id, starrating) VALUES ($1, $2, $3)", [fk_bookings_id, fk_therapist_id, starrating]);
     res.status(201).send(`Rating added: ${newRating}`);

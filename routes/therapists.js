@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const config = require('config');
+const auth = require('../middleware/auth');
 
 const us_states = require('../constants/us_states')
 
@@ -13,7 +14,7 @@ const pool = new Pool({
 }
 );
 
-router.get("/all", async (req, res) => {
+router.get("/all", auth, async (req, res) => {
     try {
         const allTherapists = await pool.query("SELECT * FROM tb_therapist");
         res.status(200).json(allTherapists.rows);
@@ -22,7 +23,7 @@ router.get("/all", async (req, res) => {
     }
 });
 
-router.get("/enabled/online", async (req, res) => {
+router.get("/enabled/online", auth, async (req, res) => {
     try {
         const state = req.query.state;
         if (state) {
