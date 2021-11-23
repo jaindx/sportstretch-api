@@ -11,7 +11,7 @@ const pool = new Pool({
 }
 );
 
-router.get("/pastBookings", async (req, res) => {
+router.get("/athlete/pastBookings", async (req, res) => {
     try {
         const athleteId = parseInt(req.query.athleteId, 10);
         const query = "SELECT B.bookings_id, T.first_name, B.booking_time, B.confirmation_status, R.starrating FROM tb_bookings B JOIN tb_therapist T ON B.fk_therapist_id = T.therapist_id LEFT JOIN tb_ratings R ON B.bookings_id = R.fk_bookings_id WHERE B.fk_athlete_id = $1 and booking_time < (CURRENT_TIMESTAMP - interval '1 hour') and B.confirmation_status = 1";
@@ -22,7 +22,7 @@ router.get("/pastBookings", async (req, res) => {
     }
 });
 
-router.get("/upcomingBookings", async (req, res) => {
+router.get("/athlete/upcomingBookings", async (req, res) => {
     try {
         const athleteId = parseInt(req.query.athleteId, 10);
         const query = "SELECT  B.bookings_id, T.first_name, B.booking_time, B.confirmation_status FROM tb_bookings B join tb_therapist T ON B.fk_therapist_id = T.therapist_id WHERE B.fk_athlete_id = $1 and booking_time >= (CURRENT_TIMESTAMP - interval '1 hour')";
