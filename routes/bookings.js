@@ -35,9 +35,13 @@ router.get("/athlete/upcomingBookings", auth, async (req, res) => {
 });
 
 router.post("/", auth, async (req, res) => {
-    const { fk_athlete_id, athlete_location, fk_therapist_id } = req.body;
-    const newBooking = await pool.query("INSERT INTO tb_bookings VALUES ($1, $2, $3)", [fk_athlete_id, athlete_location, fk_therapist_id]);
-    res.status(201).send(`Booking added: ${newBooking}`);
+    try {
+        const { athlete_id, athlete_location, therapist_id } = req.body;
+        const newBooking = await pool.query("INSERT INTO tb_bookings VALUES ($1, $2, $3)", [athlete_id, athlete_location, therapist_id]);
+        res.status(201).send(`Booking added: ${newBooking}`);
+    } catch (err) {
+        console.log(err.message);
+    }
 });
 
 module.exports = router;
