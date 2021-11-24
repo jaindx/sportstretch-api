@@ -22,12 +22,13 @@ router.post("/athlete", async (req, res) => {
     const hashed = await bcrypt.hash(password, salt);
 
     user = await pool.query("INSERT INTO tb_authorization (email, password, role) VALUES ($1, $2, $3) RETURNING authorization_id", [email, hashed, "athlete"]);
-    const newAthlete = await pool.query("INSERT INTO tb_athlete (fk_authorization_id, first_name, last_name, mobile) VALUES ($1, $2, $3, $4)", [user.rows[0].authorization_id, firstName, lastName, mobile]);
+    const newAthlete = await pool.query("INSERT INTO tb_athlete (fk_authorization_id, first_name, last_name, mobile) VALUES ($1, $2, $3, $4) RETURNING athlete_id", [user.rows[0].authorization_id, firstName, lastName, mobile]);
     
     res.status(200).send({
         firstName: firstName,
         lastName: lastName,
-        email: email
+        email: email,
+        athlete_id: newAthlete.rows[0].athlete_id
     });
 });
 

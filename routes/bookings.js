@@ -26,7 +26,7 @@ router.get("/athlete/pastBookings", auth, async (req, res) => {
 router.get("/athlete/upcomingBookings", auth, async (req, res) => {
     try {
         const athleteId = parseInt(req.query.athleteId, 10);
-        const query = "SELECT  B.bookings_id, T.first_name, B.booking_time, B.confirmation_status FROM tb_bookings B join tb_therapist T ON B.fk_therapist_id = T.therapist_id WHERE B.fk_athlete_id = $1 and booking_time >= (CURRENT_TIMESTAMP - interval '1 hour')";
+        const query = "SELECT B.bookings_id, T.first_name, B.booking_time, B.confirmation_status FROM tb_bookings B join tb_therapist T ON B.fk_therapist_id = T.therapist_id WHERE B.fk_athlete_id = $1 and booking_time >= (CURRENT_TIMESTAMP - interval '1 hour')";
         const upcomingBookings = await pool.query(query, [athleteId]);
         res.status(200).json(upcomingBookings.rows);
     } catch (err) {
@@ -37,8 +37,11 @@ router.get("/athlete/upcomingBookings", auth, async (req, res) => {
 router.post("/", auth, async (req, res) => {
     try {
         const { athlete_id, athlete_location, therapist_id } = req.body;
-        const newBooking = await pool.query("INSERT INTO tb_bookings VALUES ($1, $2, $3)", [athlete_id, athlete_location, therapist_id]);
-        res.status(201).send(`Booking added: ${newBooking}`);
+        const newBooking = await pool.query("INSERT INTO tb_bookings (fk_athlete_id, athlete_location, fk_therapist_id) VALUES ($1, $2, $3) RETURNING bookings_id, booking_time", [athlete_id, athlete_location, therapist_id]);
+        res.status(201).send({
+            bookings_id: newBooking.rows[0].bookings_id,
+            booking_time: newBooking.rows[0].booking_time
+        });
     } catch (err) {
         console.log(err.message);
     }
