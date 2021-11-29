@@ -47,4 +47,57 @@ router.post("/", auth, async (req, res) => {
     }
 });
 
+router.get("/therapist/pastBookings", async (req, res) => {
+    try {
+        const therapistId = parseInt(req.query.therapistId, 10);
+        const query = "SELECT  B.bookings_id,B.athlete_location, A.first_name, B.booking_time FROM tb_bookings B join tb_athlete A ON B.fk_athlete_id = A.athlete_id WHERE B.fk_therapist_id=$1 and booking_time < (CURRENT_TIMESTAMP - interval '1 hour')  and B.confirmation_status = 1";
+        const pastBookings = await pool.query(query, [therapistId]);
+        res.status(200).json(pastBookings.rows);
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
+router.get("/therapist/upcomingBookings", async (req, res) => {
+    try {
+        const therapistId = parseInt(req.query.therapistId, 10);
+        const query = "SELECT  B.bookings_id,B.athlete_location, A.first_name, B.booking_time, B.confirmation_status FROM tb_bookings B join tb_athlete A ON B.fk_athlete_id = A.athlete_id WHERE B.fk_therapist_id=$1 and booking_time >= (CURRENT_TIMESTAMP - interval '1 hour')";
+        const upcomingBookings = await pool.query(query, [therapistId]);
+        res.status(200).json(upcomingBookings.rows);
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
+router.put("/therapist/approveBooking/:id", auth, async (req, res) => {
+    try {
+        const bookings_id = parseInt(req.params.id, 10);
+        const confirmation_status=1;
+        const bookingStatus = await pool.query("UPDATE tb_bookings SET confirmation_status = $1 WHERE bookings_id = $2 RETURNING bookings_id, confirmation_status, confirmation_time", [confirmation_status, bookings_id]);
+        res.status(200).json({
+            bookings_id: bookingStatus.rows[0].bookings_id,
+            confirmation_status: bookingStatus.rows[0].confirmation_status,
+            confirmation_time: bookingStatus.rows[0].confirmation_time
+        });
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
+router.put("/therapist/declineBooking/:id", auth, async (req, res) => {
+    try {
+        const bookings_id = parseInt(req.params.id, 10);
+        const confirmation_status=0;
+        const bookingStatus = await pool.query("UPDATE tb_bookings SET confirmation_status = $1 WHERE bookings_id = $2 RETURNING bookings_id, confirmation_status, confirmation_time", [confirmation_status, bookings_id]);
+        res.status(200).json({
+            bookings_id: bookingStatus.rows[0].bookings_id,
+            confirmation_status: bookingStatus.rows[0].confirmation_status,
+            confirmation_time: bookingStatus.rows[0].confirmation_time
+        });
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
+
 module.exports = router;

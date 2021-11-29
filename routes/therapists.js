@@ -40,4 +40,18 @@ router.get("/enabled/online", auth, async (req, res) => {
     }
 });
 
+router.put("/setAvailability/:id", auth, async (req, res) => {
+    try {
+        const therapist_id = parseInt(req.params.id, 10);
+        const { availability_status } = req.body;
+        const status = await pool.query("UPDATE tb_therapist SET status = $1 WHERE therapist_id = $2 RETURNING therapist_id, status", [availability_status, therapist_id]);
+        res.status(200).json({
+            therapist_id: status.rows[0].therapist_id,
+            availability_status: status.rows[0].status
+        });
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
 module.exports = router;

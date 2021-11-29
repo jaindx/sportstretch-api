@@ -34,6 +34,18 @@ router.post("/", async (req, res) => {
     }
     else if (user.rows[0].role === "therapist") {
         //populate userObj accordingly
+        const therapist = await pool.query("SELECT therapist_id, first_name, last_name, mobile, city, state, enabled, status, average_rating FROM tb_therapist WHERE fk_authorization_id = $1", [user.rows[0].authorization_id]);
+        userObj = {
+            therapist_id : therapist.rows[0].therapist_id,
+            first_name : therapist.rows[0].first_name,
+            last_name : therapist.rows[0].last_name,
+            mobile: therapist.rows[0].mobile,
+            city: therapist.rows[0].city,
+            state: therapist.rows[0].state,
+            enabled: therapist.rows[0].enabled,
+            status: therapist.rows[0].status,
+            avg_rating: therapist.rows[0].average_rating
+        }
     }
     else if (user.rows[0].role === "admin") {
         const athlete = await pool.query("SELECT athlete_id, first_name, last_name, mobile FROM tb_athlete WHERE fk_authorization_id = $1", [user.rows[0].authorization_id]);
