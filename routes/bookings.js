@@ -73,7 +73,7 @@ router.put("/therapist/approveBooking/:id", auth, async (req, res) => {
     try {
         const bookings_id = parseInt(req.params.id, 10);
         const confirmation_status=1;
-        const bookingStatus = await pool.query("UPDATE tb_bookings SET confirmation_status = $1 WHERE bookings_id = $2 RETURNING bookings_id, confirmation_status, confirmation_time", [confirmation_status, bookings_id]);
+        const bookingStatus = await pool.query("UPDATE tb_bookings SET confirmation_status = $1, confirmation_time = CURRENT_TIMESTAMP  WHERE bookings_id = $2 RETURNING bookings_id, confirmation_status, confirmation_time", [confirmation_status, bookings_id]);
         res.status(200).json({
             bookings_id: bookingStatus.rows[0].bookings_id,
             confirmation_status: bookingStatus.rows[0].confirmation_status,
@@ -88,7 +88,7 @@ router.put("/therapist/declineBooking/:id", auth, async (req, res) => {
     try {
         const bookings_id = parseInt(req.params.id, 10);
         const confirmation_status=0;
-        const bookingStatus = await pool.query("UPDATE tb_bookings SET confirmation_status = $1 WHERE bookings_id = $2 RETURNING bookings_id, confirmation_status, confirmation_time", [confirmation_status, bookings_id]);
+        const bookingStatus = await pool.query("UPDATE tb_bookings SET confirmation_status = $1, confirmation_time = CURRENT_TIMESTAMP WHERE bookings_id = $2 RETURNING bookings_id, confirmation_status, confirmation_time", [confirmation_status, bookings_id]);
         res.status(200).json({
             bookings_id: bookingStatus.rows[0].bookings_id,
             confirmation_status: bookingStatus.rows[0].confirmation_status,
