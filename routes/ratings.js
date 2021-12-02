@@ -29,7 +29,7 @@ router.put("/:id", auth, async (req, res) => {
 router.post("/", auth, async (req, res) => {
     try {
         const { bookings_id, therapist_id, starrating } = req.body;
-        const newRating = await pool.query("INSERT INTO tb_ratings (fk_bookings_id, fk_therapist_id, starrating) VALUES ($1, $2, $3)", [bookings_id, therapist_id, starrating]);
+        const newRating = await pool.query("INSERT INTO tb_ratings (fk_bookings_id, fk_therapist_id, starrating) VALUES ($1, $2, $3) ON CONFLICT (fk_bookings_id) DO UPDATE SET starrating = $3", [bookings_id, therapist_id, starrating]);
         res.status(201).send({
             bookings_id: bookings_id,
             starrating: starrating
