@@ -33,7 +33,6 @@ router.post("/", async (req, res) => {
         }
     }
     else if (user.rows[0].role === "therapist") {
-        //populate userObj accordingly
         const therapist = await pool.query("SELECT therapist_id, first_name, last_name, mobile, city, state, enabled, status, average_rating FROM tb_therapist WHERE fk_authorization_id = $1", [user.rows[0].authorization_id]);
         userObj = {
             therapist_id : therapist.rows[0].therapist_id,
@@ -59,6 +58,7 @@ router.post("/", async (req, res) => {
 
     const authResObj = {
         role : user.rows[0].role,
+        authorization_id: user.rows[0].authorization_id,
         userObj: userObj
     }
 
