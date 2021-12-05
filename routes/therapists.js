@@ -54,4 +54,59 @@ router.put("/setAvailability/:id", auth, async (req, res) => {
     }
 });
 
+router.get("/requests", auth, async (req, res) =>{
+    try{
+    const requests = await pool.query("SELECT * FROM tb_therapist WHERE enabled = -1");
+    res.status(200).json(requests.rows);
+    }
+    catch (err){
+        console.log(err.message);
+    }
+})
+
+router.put("/approve/:id", auth, async (req, res) => {
+    try {
+        const therapist_id = parseInt(req.params.id, 10);
+        const approved = await pool.query("UPDATE tb_therapist SET enabled = 1 WHERE therapist_id=$1 RETURNING *", [therapist_id]);
+        res.status(200).json(approved.rows);
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
+router.put("/disable/:id", auth, async (req, res) => {
+    try {
+        const therapist_id = parseInt(req.params.id, 10);
+        const denied = await pool.query("UPDATE tb_therapist SET enabled = 0 WHERE therapist_id=$1 RETURNING *", [therapist_id]);
+        res.status(200).json(denied.rows);
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
+router.put("/toggle/:id", auth, async (req, res) => {
+    try {
+        const therapist_id = parseInt(req.params.id, 10);
+        const enabled  = parseInt(req.body.enabled);
+        const toggled = await pool.query("UPDATE tb_therapist SET enabled = $1 WHERE therapist_id=$2 RETURNING *", [enabled,therapist_id]);
+        res.status(200).json(toggled.rows);
+        
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
+router.put("/toggle/:id", auth, async (req, res) => {
+    try {
+        const therapist_id = parseInt(req.params.id, 10);
+        const enabled  = parseInt(req.body.enabled);
+        const toggled = await pool.query("UPDATE tb_therapist SET enabled = $1 WHERE therapist_id=$2 RETURNING *", [enabled,therapist_id]);
+        res.status(200).json(toggled.rows);
+        
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
+
 module.exports = router;
