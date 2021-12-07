@@ -31,4 +31,21 @@ router.post("/notifyTherapist", auth, async (req, res) => {
     }
 });
 
+router.post("/notifyAthlete", auth, async (req, res) => {
+    try {
+        const { athleteId, message } = req.body;
+        const result = await pool.query("SELECT expo_push_token from tb_authorization JOIN tb_athlete ON authorization_id = fk_authorization_id where athlete_id = $1", [athleteId]);
+        const athleteToken = result.rows[0].expo_push_token;
+        if (!athleteToken) return res.status(400).send({ error: "Athlete token not available." });
+
+        if (Expo.isExpoPushToken(athleteToken))
+        await sendPushNotification(athleteToken, message);
+
+        res.status(201).send();
+
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
 module.exports = router;
