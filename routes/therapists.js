@@ -16,7 +16,7 @@ const pool = new Pool({
 
 router.get("/all", auth, async (req, res) => {
     try {
-        const allTherapists = await pool.query("SELECT first_name, last_name, mobile, city, state, enabled, email FROM tb_therapist T JOIN tb_authorization A  ON T.fk_authorization_id = A.authorization_id WHERE T.enabled != -1");
+        const allTherapists = await pool.query("SELECT first_name, last_name, mobile, city, state, enabled, average_rating, therapist_id, email FROM tb_therapist T JOIN tb_authorization A  ON T.fk_authorization_id = A.authorization_id WHERE T.enabled != -1");
         res.status(200).json(allTherapists.rows);
     } catch (err) {
         console.log(err.message);
@@ -56,7 +56,7 @@ router.put("/setAvailability/:id", auth, async (req, res) => {
 
 router.get("/requests", auth, async (req, res) =>{
     try{
-    const requests = await pool.query("SELECT first_name, last_name, mobile, email FROM tb_therapist T JOIN tb_authorization A  ON T.fk_authorization_id = A.authorization_id WHERE T.enabled = -1");
+    const requests = await pool.query("SELECT first_name, last_name, mobile, email, therapist_id FROM tb_therapist T JOIN tb_authorization A  ON T.fk_authorization_id = A.authorization_id WHERE T.enabled = -1");
     res.status(200).json(requests.rows);
     }
     catch (err){
